@@ -1,4 +1,3 @@
-
 import lxml.etree as etree
 import subprocess
 import tempfile
@@ -65,7 +64,14 @@ class GraphProcessor():
                         source_product_elem = etree.SubElement(sources_elem, 'sourceProduct.%s' % str(index))
 
                     source_product_elem.attrib['refid'] = s
+            
+            if isinstance(source, dict):
 
+                for key, value in source.iteritems():
+                    
+                    source_product_elem = etree.SubElement(sources_elem, key)
+                    source_product_elem.text = value
+            
             elif source != '':
                 source_product_elem = etree.SubElement(sources_elem, 'sourceProduct')
                 source_product_elem.attrib['refid'] = source
