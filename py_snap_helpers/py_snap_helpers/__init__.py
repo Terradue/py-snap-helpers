@@ -65,7 +65,7 @@ class GraphProcessor():
 
                     source_product_elem.attrib['refid'] = s
             
-            if isinstance(source, dict):
+            elif isinstance(source, dict):
 
                 for key, value in source.iteritems():
                     
