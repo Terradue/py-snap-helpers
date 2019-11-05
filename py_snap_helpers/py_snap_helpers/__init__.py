@@ -167,20 +167,36 @@ def get_operator_default_parameters(operator):
 
 def get_operator_help(op):
     
-        op_spi = GPF.getDefaultInstance().getOperatorSpiRegistry().getOperatorSpi(op)
+    """This function prints the human readable WPS parameters for the provided WPS process identifier and returns a dictionary with the parameters as keys (no default  values) 
+    
+    Args:
+        wps_url: the WPS end-point.
+        process_id: the process identifier
+        verbose: print the human readable WPS parameters
         
-        print('Operator name: {}'.format(op_spi.getOperatorDescriptor().getName()))
-        
-        print('Operator alias: {}\n'.format(op_spi.getOperatorDescriptor().getAlias()))
-        print('Parameters:\n')
-        param_Desc = op_spi.getOperatorDescriptor().getParameterDescriptors()
-        
-        for param in param_Desc:
-            print('{}: {}\nDefault Value: {}\n'.format(param.getName(),
-                                                       param.getDescription(),
-                                                       param.getDefaultValue()))
-            
-            print('Possible values: {}\n').format(list(param.getValueSet()))
+    Returns
+        A dictionary with the parameters as keys (no default values) .
+    
+    Raises:
+        None.
+    """
+
+    
+    
+    op_spi = GPF.getDefaultInstance().getOperatorSpiRegistry().getOperatorSpi(op)
+
+    print('Operator name: {}'.format(op_spi.getOperatorDescriptor().getName()))
+
+    print('Operator alias: {}\n'.format(op_spi.getOperatorDescriptor().getAlias()))
+    print('Parameters:\n')
+    param_Desc = op_spi.getOperatorDescriptor().getParameterDescriptors()
+
+    for param in param_Desc:
+        print('{}: {}\nDefault Value: {}\n'.format(param.getName(),
+                                                   param.getDescription(),
+                                                   param.getDefaultValue()))
+
+        print('Possible values: {}\n').format(list(param.getValueSet()))
             
             
 def backscatter(**kwargs):
@@ -246,3 +262,49 @@ def op_help(op):
                                                        param.getDefaultValue()))
             
             print('Possible values: {}\n').format(list(param.getValueSet()))
+
+def get_operators():
+            
+    snappy.GPF.getDefaultInstance().getOperatorSpiRegistry().loadOperatorSpis()
+
+    op_spi_it = snappy.GPF.getDefaultInstance().getOperatorSpiRegistry().getOperatorSpis().iterator()
+
+    snap_operators = dict()
+
+    while op_spi_it.hasNext():
+
+        op_spi = op_spi_it.next()
+
+        op_class = op_spi.getOperatorDescriptor().getName()
+
+        if 's1tbx' in op_spi.getOperatorDescriptor().getName():
+
+            op_toolbox = 's1tbx'
+
+        elif 's2tbx' in op_spi.getOperatorDescriptor().getName():
+
+            op_toolbox = 's2tbx'
+
+        elif 's3tbx' in op_spi.getOperatorDescriptor().getName():
+
+            op_toolbox = 's3tbx'
+        else:
+
+            op_toolbox = 'other'
+
+        snap_operators[op_spi.getOperatorAlias()] = {'name' : op_spi.getOperatorDescriptor().getName(), 
+                                                     'toolbox' : op_toolbox}
+        
+    return snap_operators
+
+def get_write_formats():
+    
+    ProductIOPlugInManager = snappy.jpy.get_type('org.esa.snap.core.dataio.ProductIOPlugInManager')
+
+    ProductWriterPlugIn = snappy.jpy.get_type('org.esa.snap.core.dataio.ProductWriterPlugIn')
+
+    write_plugins = ProductIOPlugInManager.getInstance().getAllWriterPlugIns()
+
+    while write_plugins.hasNext():
+        plugin = write_plugins.next()
+        print ('{} ({})'.format(plugin.getFormatNames()[0], plugin.getDefaultFileExtensions()[0]))
