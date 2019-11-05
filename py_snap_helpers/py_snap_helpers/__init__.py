@@ -8,6 +8,13 @@ import snappy
 from snappy import GPF
 
 class GraphProcessor():
+    """SNAP Graph class
+
+    This class provides the methods to create, view and run a SNAP Graph
+
+    Attributes:
+        None.
+    """
     
     def __init__(self, wdir='.'):
         self.root = etree.Element('graph')
@@ -19,11 +26,34 @@ class GraphProcessor():
         self.wdir = wdir
    
     def view_graph(self):
-        
+        """This method prints SNAP Graph
+    
+        Args:
+            None.
+
+        Returns
+            None.
+
+        Raises:
+            None.
+        """
         print(etree.tostring(self.root , pretty_print=True))
         
     def add_node(self, node_id, operator, parameters, source):
+        """This method adds or overwrites a node to the SNAP Graph
     
+        Args:
+            node_id: node identifier
+            operator: SNAP operator
+            parameter: dictionary with the SNAP operator parameters
+            source: string or list of sources (previous node identifiers in the SNAP Graph)
+
+        Returns
+            None.
+
+        Raises:
+            None.
+        """
         xpath_expr = '/graph/node[@id="%s"]' % node_id
 
         if len(self.root.xpath(xpath_expr)) != 0:
@@ -100,27 +130,48 @@ class GraphProcessor():
         operator_elem.text = operator 
 
     def save_graph(self, filename):
-        
+        """This method saves the SNAP Graph
+    
+        Args:
+            filename: XML filename with '.xml' extension
+
+        Returns
+            None.
+
+        Raises:
+            None.
+        """
         with open(filename, 'wb') as file:
             file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
             file.write(etree.tostring(self.root, pretty_print=True))
      
-    def plot_graph(self):
+    #def plot_graph(self):
         
-        for node_id in self.root.xpath('/graph/node/@id'):
+    #    for node_id in self.root.xpath('/graph/node/@id'):
             
 
-            xpath_expr = '/graph/node[@id="%s"]' % node_id
+    #        xpath_expr = '/graph/node[@id="%s"]' % node_id
             
-            if len(self.root.xpath(xpath_expr + '/sources/sourceProduct')) != 0:
-                print(self.root.xpath(xpath_expr + '/sources/sourceProduct'))[0].attrib['refid']
-                print(node_id)
-            else:
-                print(node_id)
-        return True
+    #        if len(self.root.xpath(xpath_expr + '/sources/sourceProduct')) != 0:
+    #            print(self.root.xpath(xpath_expr + '/sources/sourceProduct'))[0].attrib['refid']
+    #            print(node_id)
+    #        else:
+    #            print(node_id)
+    #    return True
     
     def run(self):
-        
+        """This method runs the SNAP Graph using gpt
+    
+        Args:
+            None.
+
+        Returns
+            res: gpt exit code 
+            err: gpt stderr
+
+        Raises:
+            None.
+        """
         os.environ['LD_LIBRARY_PATH'] = '.'
         
         print('Processing the graph')
@@ -146,9 +197,20 @@ class GraphProcessor():
             os.remove(path)
             
             print('Done.')
+        return res, err
         
 def get_snap_parameters(operator):
+    """This function returns the SNAP operator ParameterDescriptors (snappy method op_spi.getOperatorDescriptor().getParameterDescriptors())
     
+    Args:
+        operator: SNAP operator
+        
+    Returns
+        The snappy object returned by op_spi.getOperatorDescriptor().getParameterDescriptors().
+    
+    Raises:
+        None.
+    """
     op_spi = GPF.getDefaultInstance().getOperatorSpiRegistry().getOperatorSpi(operator)
 
     op_params = op_spi.getOperatorDescriptor().getParameterDescriptors()
@@ -156,7 +218,17 @@ def get_snap_parameters(operator):
     return op_params
 
 def get_operator_default_parameters(operator):
+    """This function returns a Python dictionary with the SNAP operator parameters and their default values, if available.
     
+    Args:
+        operator: SNAP operator
+        
+    Returns
+        A Python dictionary with the SNAP operator parameters and their default values.
+    
+    Raises:
+        None.
+    """
     parameters = dict()
 
     for param in get_snap_parameters(operator):
@@ -165,25 +237,19 @@ def get_operator_default_parameters(operator):
     
     return parameters
 
-def get_operator_help(op):
-    
-    """This function prints the human readable WPS parameters for the provided WPS process identifier and returns a dictionary with the parameters as keys (no default  values) 
+def get_operator_help(operator):
+    """This function prints the human readable information about a SNAP operator 
     
     Args:
-        wps_url: the WPS end-point.
-        process_id: the process identifier
-        verbose: print the human readable WPS parameters
+        operator: SNAP operator
         
     Returns
-        A dictionary with the parameters as keys (no default values) .
+        The human readable information about the provided SNAP operator.
     
     Raises:
         None.
     """
-
-    
-    
-    op_spi = GPF.getDefaultInstance().getOperatorSpiRegistry().getOperatorSpi(op)
+    op_spi = GPF.getDefaultInstance().getOperatorSpiRegistry().getOperatorSpi(operator)
 
     print('Operator name: {}'.format(op_spi.getOperatorDescriptor().getName()))
 
@@ -200,7 +266,17 @@ def get_operator_help(op):
             
             
 def backscatter(**kwargs):
-   
+    """This function provides an example of a simple Graph producing the Sentinel-1 backscatters. This approach is valid for linear SNAP Graphs i.e. no fan-in/out in the DAG.  
+    
+    Args:
+        kwargs: One or more dictionaries containing the SNAP operator parameters.
+        
+    Returns
+        None.
+    
+    Raises:
+        None.
+    """
     options = dict()
     
     operators = ['Read', 
@@ -247,24 +323,44 @@ def backscatter(**kwargs):
     
     
 def op_help(op):
+    """This function prints the human readable information about a SNAP operator 
     
-        op_spi = snappy.GPF.getDefaultInstance().getOperatorSpiRegistry().getOperatorSpi(op)
+    Args:
+        op: the SNAP operator 
         
-        print('Operator name: {}'.format(op_spi.getOperatorDescriptor().getName()))
-        
-        print('Operator alias: {}\n'.format(op_spi.getOperatorDescriptor().getAlias()))
-        print('Parameters:\n')
-        param_Desc = op_spi.getOperatorDescriptor().getParameterDescriptors()
-        
-        for param in param_Desc:
-            print('{}: {}\nDefault Value: {}\n'.format(param.getName(),
-                                                       param.getDescription(),
-                                                       param.getDefaultValue()))
-            
-            print('Possible values: {}\n').format(list(param.getValueSet()))
+    Returns
+        Human readable information about a SNAP operator.
+    
+    Raises:
+        None.
+    """
+    op_spi = snappy.GPF.getDefaultInstance().getOperatorSpiRegistry().getOperatorSpi(op)
+
+    print('Operator name: {}'.format(op_spi.getOperatorDescriptor().getName()))
+
+    print('Operator alias: {}\n'.format(op_spi.getOperatorDescriptor().getAlias()))
+    print('Parameters:\n')
+    param_Desc = op_spi.getOperatorDescriptor().getParameterDescriptors()
+
+    for param in param_Desc:
+        print('{}: {}\nDefault Value: {}\n'.format(param.getName(),
+                                                   param.getDescription(),
+                                                   param.getDefaultValue()))
+
+        print('Possible values: {}\n').format(list(param.getValueSet()))
 
 def get_operators():
-            
+    """This function provides a Python dictionary with all SNAP operators. 
+    
+    Args:
+        None.
+        
+    Returns
+        Python dictionary with all SNAP operators.
+    
+    Raises:
+        None.
+    """
     snappy.GPF.getDefaultInstance().getOperatorSpiRegistry().loadOperatorSpis()
 
     op_spi_it = snappy.GPF.getDefaultInstance().getOperatorSpiRegistry().getOperatorSpis().iterator()
@@ -298,7 +394,17 @@ def get_operators():
     return snap_operators
 
 def get_write_formats():
+    """This function provides a human readable list of SNAP Write operator formats. 
     
+    Args:
+        None.
+        
+    Returns
+        Human readable list of SNAP Write operator formats.
+    
+    Raises:
+        None.
+    """
     ProductIOPlugInManager = snappy.jpy.get_type('org.esa.snap.core.dataio.ProductIOPlugInManager')
 
     ProductWriterPlugIn = snappy.jpy.get_type('org.esa.snap.core.dataio.ProductWriterPlugIn')

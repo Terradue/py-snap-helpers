@@ -8,7 +8,7 @@ The main components of the Sentinel Toolbox are:
 
 - An intuitive desktop application used for EO data visualisation, analysing and processing.
 - A set of scientific data processors running either from the command-line or invoked by the desktop application.
-- The command-line tool gpt (graph processing tool) is used to execute processing graphs made up of operators nodes developed using the SNAP GPF (see Java API below).
+- The command-line tool gpt (graph processing tool) is used to execute processing graphs made up of operators nodes developed using the SNAP GPF.
 - A data product converter tool pconvert allowing a user to convert raw data products to the BEAM-DIMAP standard format, to GeoTIFF, to HDF-5 or to RGB images.
 - A Java™ API which provides ready-to-use components for remote sensing related application development and plug-in points for new SNAP extension modules. Besides a number of extension points such as product reader and writers, the SNAP API comprises the Graph Processing Framework (GPF) which is used to rapidly create raster data processors. The Rich Client Platform is used to develop rich GUI user interface applications based on SNAP.
 
