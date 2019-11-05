@@ -38,4 +38,5 @@ conda install -y -c terradue -n <environment name> py_snap_helpers
 
 ### Example
 
+See the Jupyter notebook under the folder **examples**
 
