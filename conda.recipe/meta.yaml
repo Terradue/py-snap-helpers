@@ -30,11 +30,14 @@ requirements:
 
   run:
     - python
+    - lxml
+    - psutil
+    - snappy
 
 test:
   # Python imports
   imports:
-
+    - lxml
   commands:
     # You can put test commands to be run here.  Use this to test that the
     # entry points work.
@@ -43,9 +46,11 @@ test:
   # You can also put a file called run_test.py in the recipe that will be run
   # at test time.
 
-  # requires:
+  requires:
     # Put any additional test requirements here.  For example
-    # - nose
+    - lxml
+    - psutil
+    - snappy
 
 about:
   home: http://project.terradue.com/
