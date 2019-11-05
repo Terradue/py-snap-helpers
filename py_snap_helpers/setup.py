@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='py_snap_helpers',
-      version='0.0.3',
+      version='{{version}}',
       description='Helpers for SNAP and Python',
       url='https://git.terradue.com/scoop/py-snap-helpers',
       author='Terradue',
